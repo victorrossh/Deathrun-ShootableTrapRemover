@@ -19,20 +19,19 @@ This plugin automatically removes **interactive** `func_breakable` entities from
 
 ---
 
-````md
 ## How It Works
 
 1. On map load (`plugin_cfg()`), the plugin waits **5 seconds** to ensure all entities are fully spawned.
 2. Iterates through every entity with classname `func_breakable`.
 3. Reads the entity spawnflags:  
    https://github.com/ValveSoftware/halflife/blob/b1b5cf5892918535619b2937bb927e46cb097ba1/dlls/util.h#L440C1-L444C66
-   ```c
+   ```
    // func breakable
    #define SF_BREAK_TRIGGER_ONLY  1   // may only be broken by trigger
    #define SF_BREAK_TOUCH         2   // can be 'crashed through' by running player (plate glass)
    #define SF_BREAK_PRESSURE      4   // can be broken by a player standing on it
    #define SF_BREAK_CROWBAR       256 // instant break if hit with crowbar
-````
+    ```
 
 4. Breakables are classified based on their spawnflags:
 
