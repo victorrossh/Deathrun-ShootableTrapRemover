@@ -11,13 +11,14 @@
 
 #include <amxmodx>
 #include <fakemeta>
-#include <amxmisc>
 #include <engine>
 #include <cromchat2>
 
 #define PLUGIN   "Shoot Breakable Traps Deathrun"
 #define VERSION  "1.0"
 #define AUTHOR   "ftl~"
+
+#define DESTROY_TIME 5.0
 
 #pragma semicolon 1
 
@@ -35,7 +36,7 @@ public plugin_init() {
 }
 
 public plugin_cfg() {
-	set_task(5.0, "RemoveShoot");
+	set_task(DESTROY_TIME, "RemoveBreakables");
 }
 
 // There is no need to check on the EventNewRound event.
@@ -50,13 +51,11 @@ public plugin_cfg() {
 // Since the entity is removed from memory, it will not be restored in the next round.
 
 /*public EventNewRound() {	
-	set_task(1.0, "RemoveShoot");
+	set_task(1.0, "RemoveBreakables");
 }*/
 
-public RemoveShoot() {
+public RemoveBreakables() {
 	new total_break = 0;
-	new shootable_count = 0;
-	new removed_count = 0;
 	new Array:to_remove = ArrayCreate(); // Collects all entities that need to be removed.
 	new ent = -1;
 
@@ -72,12 +71,15 @@ public RemoveShoot() {
 				ent, flags, (flags & 1) ? "YES" : "NO", health, targetname[0] ? targetname : "<none>");
 		}
 		
-		// Shootable breakables are removed: these do NOT have spawnflag 1 ("Only Trigger").
-		// With "Only Trigger" enabled, they ignore bullets/explosions and can only be broken by triggers.
-		if(!(flags & 1)) {
-			shootable_count++;
+		// Breakables that can be destroyed by player interaction are removed.
+		// This includes breakables that can be broken by touch, pressure, or crowbar
+		// (SF_BREAK_TOUCH / SF_BREAK_PRESSURE / SF_BREAK_CROWBAR).
+		// Trigger-only breakables (SF_BREAK_TRIGGER_ONLY) are excluded, as they
+		// ignore player damage and can only be broken via triggers.
+		if (flags & (SF_BREAK_TOUCH | SF_BREAK_PRESSURE | SF_BREAK_CROWBAR)) {
 			ArrayPushCell(to_remove, ent);
 		}
+
 	}
 
 	// Removes everything that was collected.
@@ -86,20 +88,18 @@ public RemoveShoot() {
 		ent = ArrayGetCell(to_remove, i);
 		if(pev_valid(ent)) {
 			remove_entity(ent);
-			removed_count++;
 		}
 	}
-	
+
 	ArrayDestroy(to_remove);
-
+	
 	// Debug messages
-	if(g_bDebugMode) {
-		CC_SendMessage(0, "Scan finished: &x04%d &x01total breakables, &x04%d &x01shootable, &x04%d &x01removed.", total_break, shootable_count, removed_count);
-		
-		if(total_break == 0)
-			CC_SendMessage(0, "No &x04func_breakable &x01entities found on the map.");
+	if (g_bDebugMode) {
+		CC_SendMessage(0, "Scan finished: &x04%d &x01total breakables, &x04%d &x01interactive.", total_break, size);
 
-		else if(removed_count == 0 && shootable_count == 0)
-			CC_SendMessage(0, "All breakables are &x04Only Trigger&x01, nothing removed.");
+		if (total_break == 0)
+			CC_SendMessage(0, "No &x04func_breakable &x01entities found on the map.");
+		else if (size == 0)
+			CC_SendMessage(0, "All breakables are non-interactive (trigger-only or indestructible), nothing removed.");
 	}
 }

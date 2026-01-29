@@ -19,14 +19,30 @@ This plugin automatically removes **shootable** `func_breakable` entities from m
 
 ---
 
+````md
 ## How It Works
 
-1. On map load (`plugin_cfg()`), the plugin waits **5 seconds** to ensure all entities are fully spawned
-2. Iterates through every entity with classname `func_breakable`
-3. Reads the entity spawnflags:
-   - `flags & 1` → **Only Trigger** → entity is preserved
-   - `!(flags & 1)` → **Shootable** → entity is collected and removed
-4. Displays scan statistics **only when debug mode is enabled**
+1. On map load (`plugin_cfg()`), the plugin waits **5 seconds** to ensure all entities are fully spawned.
+2. Iterates through every entity with classname `func_breakable`.
+3. Reads the entity spawnflags:  
+   https://github.com/ValveSoftware/halflife/blob/b1b5cf5892918535619b2937bb927e46cb097ba1/dlls/util.h#L440C1-L444C66
+   ```c
+   // func breakable
+   #define SF_BREAK_TRIGGER_ONLY  1   // may only be broken by trigger
+   #define SF_BREAK_TOUCH         2   // can be 'crashed through' by running player (plate glass)
+   #define SF_BREAK_PRESSURE      4   // can be broken by a player standing on it
+   #define SF_BREAK_CROWBAR       256 // instant break if hit with crowbar
+````
+
+4. Breakables are classified based on their spawnflags:
+
+   * `flags & (SF_BREAK_TOUCH | SF_BREAK_PRESSURE | SF_BREAK_CROWBAR)`
+     → **Player-interactive breakable** (touch / pressure / crowbar)
+     → entity is collected and removed
+   * No interactive flags set
+     → **Non-interactive breakable** (trigger-only or otherwise indestructible by players)
+     → entity is preserved
+5. Displays scan statistics **only when debug mode is enabled**.
 
 ---
 
@@ -58,8 +74,7 @@ To enable debug mode, add `debug` next to the plugin name in `plugins.ini`:
 **Example chat output:**
 
 ```
-[FWO] Scan finished: 7 total breakables, 6 shootable, 6 removed.
-[FWO] 6 shootable breakables removed successfully!
+[FWO] Scan finished: 7 total breakables, 4 interactive.
 ```
 
 ---
