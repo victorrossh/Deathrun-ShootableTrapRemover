@@ -1,10 +1,15 @@
 # Remove Interactive Breakables
-### AMX Mod X Plugin
+#### AMX Mod X Plugin
 
-**Version:** 1.0  
-**Author:** ftl~  
+---
 
-This plugin automatically removes **interactive** `func_breakable` entities from maps during map load.
+## Credits
+- **ftl~** 
+- **Mrshark45**
+
+---
+
+#### This plugin automatically removes **interactive** `func_breakable` entities from maps during map load.
 
 ---
 
