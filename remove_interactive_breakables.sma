@@ -14,9 +14,9 @@
 #include <engine>
 #include <cromchat2>
 
-#define PLUGIN   "Shoot Breakable Traps Deathrun"
+#define PLUGIN   "Remove Interactive Breakables"
 #define VERSION  "1.0"
-#define AUTHOR   "ftl~"
+#define AUTHOR   "ftl~ & MrShark45"
 
 #define DESTROY_TIME 5.0
 

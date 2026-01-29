@@ -1,18 +1,18 @@
-# Shoot Breakable Traps Deathrun  
+# Remove Interactive Breakables
 ### AMX Mod X Plugin
 
 **Version:** 1.0  
 **Author:** ftl~  
 
-This plugin automatically removes **shootable** `func_breakable` entities from maps during map load.
+This plugin automatically removes **interactive** `func_breakable` entities from maps during map load.
 
 ---
 
 ## Features
 
 - Scans all `func_breakable` entities shortly after map load
-- Removes only **shootable** breakables
-- Preserves **trigger-only** breakables (`spawnflag 1 = Only Trigger`)
+- Removes only **interactive** breakables
+- Preserves **trigger-only** breakables (`spawnflag SF_BREAK_TRIGGER_ONLY`)
 - One-time removal per map load (no per-round processing)
 - Debug mode with detailed logs and chat messages
 - Uses **CromChat2** for clean, prefixed, and colored chat output
@@ -91,7 +91,7 @@ To enable debug mode, add `debug` next to the plugin name in `plugins.ini`:
 ## Possible Improvements (TODO)
 
 - Add a CVAR to enable or disable automatic removal  
-  Example: `amx_remove_shootable 1/0`
+  Example: `amx_remove_breakables 1/0`
 
 - If automatic removal is disabled, add a manual admin command to trigger the removal logic.
 
